@@ -15,15 +15,14 @@ jobs:
     - stage: "Build and publish alpine-glibc"
       env:
         - PROJECT_NAME=alpine-glibc
-      script: alpine-glibc/build.sh
+      script: .travis/build.sh
       deploy:
         - provider: script
           script: .travis/deploy.sh
     - stage: "Build and publish alpine-corretto-11"
       env:
-        - REGISTRY_OWNER=$DOCKER_USERNAME
         - PROJECT_NAME=alpine-corretto-11
-      script: alpine-corretto-11/build.sh
+      script: .travis/build.sh
       deploy:
         - provider: script
           script: .travis/deploy.sh
