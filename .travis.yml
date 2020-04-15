@@ -1,23 +1,32 @@
 language: shell
+os: linux
 dist: xenial
 
 services:
 - docker
 
-# Upgrade Docker to the current version
 before_install:
 - sudo apt update -y
 - sudo apt install --only-upgrade docker-ce -y
 - docker info
 
-script:
-- alpine-glibc/build.sh
-
-after_success:
-- | # Push the alpine-glibc Docker image
-  echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin;
-  docker tag "alpine-glibc" "${REG_USERNAME}/alpine-glibc:latest"
-  docker push "${REG_USERNAME}/alpine-glibc:latest"
+jobs:
+  include:
+    - stage: "Build and publish alpine-glibc"
+      env:
+        - PROJECT_NAME=alpine-glibc
+      script: alpine-glibc/build.sh
+      deploy:
+        - provider: script
+          script: .travis/deploy.sh
+    - stage: "Build and publish alpine-corretto-11"
+      env:
+        - REGISTRY_OWNER=$DOCKER_USERNAME
+        - PROJECT_NAME=alpine-corretto-11
+      script: alpine-corretto-11/build.sh
+      deploy:
+        - provider: script
+          script: .travis/deploy.sh
 
 # We want all PRs built but only merges on master branch
 branches:
@@ -25,12 +34,6 @@ branches:
   - master
 
 notifications:
-  slack:
-    if: branch = master
-    rooms:
-      - secure: EkYJNa0QUmlJffFqAIS7RraDQsm4Ag26Csk3GzE0Rm+zLsz/DzJDTs41kPAERTsviYqNmYIXVF4yMfG5mpIXxGvQQA2W2GCeVEG/yyNHmQ2gS4woRM4oBtUD5SJgzXvKqQjCiSmjBeRrWCNSYM6Vkva14sc+Sk96QWtR+UMDb4kyMUCYbh++eUN1LgsZY+FERhjJ7j7x/L23ErFgvy9HmkO+IUrPt+eVhzK1Ek3qTdwYpmjkCbayrSsOq7gmF4xeqMZBT6S2193Cd7yFdPLJ9DGLhP56r8hslFHYpIlv9UtNNHQJQ3Qc/1kxMf3qWwAcpHNt4eyLXqWKERTppKd97yB5fM+mckHIY8ieA4baT9CDMBGp9NQCUGbflbrg1wpu3FEwGWjBWyUXIc678ZGXclhDstxvRzd+sZYqp6+0GJmcpbRmnzQwsZCOYjQ0f9yTIMCj7PLIZzPBu9ZKchkaUcex/tyNuqUr8sv2CL1H4oicjP3a6fevg7f12WLzB34UQaXlMvb6fYzx1+FrX6714c6TnZ6MsPBRnJxb3oitagRYRnJ8t22E/ohCGbNH6grSlIuqcJzWz1Trw2HbVkxiCG1uUiOYNefdeiWtjUHG5jscLzZs1hSZjLZ87j99+jVayHKJOzMrhnTHD8P18hEh1XG7GT7pY6CFDFebY4tG9PM=
-    template:
-      - "Build <%{build_url}|#%{build_number}>(%{result}) %{repository_slug}@%{branch} - %{message}"
   email:
     recipients:
       - ksclarke@ksclarke.io

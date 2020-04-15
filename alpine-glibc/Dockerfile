@@ -1,4 +1,5 @@
 
+# Our base Docker image
 FROM alpine:3.11.5
 
 # We need a glibc compatibility layer over musl
@@ -11,7 +12,7 @@ ARG LD_VERSION=2.31
 # Locale of our instance
 ARG LOCALE=en_US
 
-# A build date that our build.sh script supplies
+# Some metadata for our Docker image
 ARG REPO_OWNER=ksclarke
 ARG REPO_EMAIL=ksclarke@ksclarke.io
 ARG BUILD_DATE
@@ -19,6 +20,7 @@ ARG BUILD_DATE
 # Set our UTF-8 locale
 ENV LANG=${LOCALE}.UTF-8
 
+# Set some metadata on our Docker image
 LABEL maintainer="${REPO_EMAIL}"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.build-date="${BUILD_DATE}"
