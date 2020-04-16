@@ -4,7 +4,7 @@ This project is a collection of basebox Docker images.
 
 ## How to Build
 
-These baseboxes are intended to be built by Travis-CI. They are set up to build nightly. The nightly build is pushed to DockerHub using the `latest` tag. If the future, I'll add tagged builds.
+These baseboxes are intended to be built by Travis-CI. They are set up to build nightly. The nightly build is pushed to [DockerHub](https://hub.docker.com/u/ksclarke) using the `latest` tag. In the future, I'll add tagged builds.
 
 If you want to build them locally, there is a simple build script that can assist. To build all of them, type:
 
@@ -14,7 +14,7 @@ If you want to build just one of them, you'll need to use a command like:
 
     PROJECT_NAME=alpine-glibc .travis/build.sh
 
-The "project name" should be one of this project's top level folders (that also contains a Dockerfile inside of it).
+The "project name" should be one of this project's top level directories (that also contains a Dockerfile inside of it).
 
 ## Contact
 
