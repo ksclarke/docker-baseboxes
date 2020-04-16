@@ -8,9 +8,10 @@ services:
 before_install:
 - sudo apt update -y
 - sudo apt install --only-upgrade docker-ce -y
-- mkdir $HOME/.docker
-- echo '{"experimental":true}' | sudo tee $HOME/.docker/config.json
+- echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
 - sudo service docker restart
+- mkdir ~/.docker
+- echo '{"experimental":"enabled"}' | tee ~/.docker/config.json
 - docker info
 
 jobs:
