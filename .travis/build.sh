@@ -9,7 +9,4 @@ if [ ! -z "$DOCKER_USERNAME" ] && [ $PROJECT_NAME != 'alpine-glibc' ]; then
 fi
 
 # Build the Docker images
-docker build --compress \
-  --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-  --build-arg DOCKER_OWNER=$DOCKER_OWNER \
-  -t $PROJECT_NAME $PROJECT_NAME
+docker build --compress --build-arg DOCKER_OWNER=$DOCKER_OWNER -t $PROJECT_NAME $PROJECT_NAME
