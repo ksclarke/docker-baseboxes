@@ -16,7 +16,8 @@ ARG REPO_OWNER="ksclarke"
 ARG REPO_EMAIL="ksclarke@ksclarke.io"
 
 # Set some environmental properties for our container
-ENV JAVA_HOME=/opt/jdk
+ENV JAVA_HOME=/opt/jdk \
+    PATH=$PATH:/opt/jdk/bin
 
 # Set some metadata on our Docker image
 LABEL maintainer="${REPO_EMAIL}" \
