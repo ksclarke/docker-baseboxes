@@ -2,15 +2,15 @@
 # A Docker basebox that has Alpine and a glibc compatibility layer installed
 #
 
-# Our base Docker image
-FROM alpine:3.11.5
+# Default values that we should be overriding
+ARG ALPINE_VERSION="latest"
+
+# Our base Alpine Docker image
+FROM alpine:${ALPINE_VERSION}
 
 # We need a glibc compatibility layer over musl
-ARG GLIBC_VERSION=2.31-r0
-ARG GLIBC_BASE_URL=https://github.com/sgerrand/alpine-pkg-glibc
-    
-# We need to create a symlink to our ld library file
-ARG LD_VERSION=2.31
+ARG GLIBC_VERSION=""
+ARG GLIBC_DOWNLOAD_URL=https://github.com/sgerrand/alpine-pkg-glibc/releases/download
     
 # Locale of our instance
 ARG LOCALE=en_US
@@ -35,17 +35,15 @@ RUN set -ex && \
 # Install glibc compatibility layer
     wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
     for PACKAGE in glibc-${GLIBC_VERSION} glibc-bin-${GLIBC_VERSION} glibc-i18n-${GLIBC_VERSION} ; do \
-      wget -q -O "/tmp/${PACKAGE}.apk" "${GLIBC_BASE_URL}/releases/download/${GLIBC_VERSION}/${PACKAGE}.apk" ; \
+      wget -q -O "/tmp/${PACKAGE}.apk" "${GLIBC_DOWNLOAD_URL}/${GLIBC_VERSION}/${PACKAGE}.apk" ; \
     done && \
     apk add --no-cache /tmp/*.apk && \
-# Fix ldconfig warnings
+    /usr/glibc-compat/bin/localedef -i "${LOCALE}" -f UTF-8 "${LANG}" && \
+# Fix ldconfig warnings (assumption: there should just be one ld-*.so)
     rm /usr/glibc-compat/lib/ld-linux-x86-64.so.2 && \
-    ln -s /usr/glibc-compat/lib/ld-${LD_VERSION}.so /usr/glibc-compat/lib/ld-linux-x86-64.so.2 && \
-# Set the locale
-    /usr/glibc-compat/bin/localedef --force --inputfile ${LOCALE} --charmap UTF-8 ${LOCALE}.UTF-8 && \
-    echo "export LANG=${LOCALE}.UTF-8" > /etc/profile.d/locale.sh && \
+    ln -s /usr/glibc-compat/lib/ld-*.so /usr/glibc-compat/lib/ld-linux-x86-64.so.2 && \
 # Clean up
-    apk del --no-cache .build-dependencies glibc-i18n && \
+    apk del --no-cache .build-dependencies glibc-i18n glibc-bin && \
     rm -rf /tmp/* /etc/apk/keys/sgerrand.rsa.pub /var/cache/ldconfig /root/.wget-hsts
 #
 # For poking around, add Bash

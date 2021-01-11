@@ -3,13 +3,15 @@
 #
 
 ARG DOCKER_OWNER=""
+ARG ALPINE_GLIBC_VERSION="latest"
 
 # Our base Docker image
-FROM ${DOCKER_OWNER}alpine-glibc:latest
+FROM ${DOCKER_OWNER}alpine-glibc:${ALPINE_GLIBC_VERSION}
 
 # Releases and checksums are listed on https://github.com/corretto/corretto-11/releases
-ARG JAVA_VERSION=11.0.7.10.1
-ARG JAVA_MD5_CHECKSUM=7fab667aba936ef21928ce5d079e2e4a
+ARG JDK_DOWNLOADS="https://corretto.aws/downloads/resources"
+ARG JDK_VERSION=""
+ARG JDK_MD5_CHECKSUM=""
 
 # Some metadata for our Docker image
 ARG REPO_OWNER="ksclarke"
@@ -29,11 +31,11 @@ LABEL maintainer="${REPO_EMAIL}" \
 RUN set -ex && \
 # Install Corretto
     wget -q -O /tmp/corretto.tar.gz \
-      https://corretto.aws/downloads/resources/${JAVA_VERSION}/amazon-corretto-${JAVA_VERSION}-linux-x64.tar.gz && \
-    echo "${JAVA_MD5_CHECKSUM}  /tmp/corretto.tar.gz" > /tmp/corretto.tar.gz.md5 && \
+      ${JDK_DOWNLOADS}/${JDK_VERSION}/amazon-corretto-${JDK_VERSION}-alpine-linux-x64.tar.gz && \
+    echo "${JDK_MD5_CHECKSUM}  /tmp/corretto.tar.gz" > /tmp/corretto.tar.gz.md5 && \
     md5sum -c /tmp/corretto.tar.gz.md5 && \
     gunzip /tmp/corretto.tar.gz && tar -C /opt -xf /tmp/corretto.tar && \
-    ln -s /opt/amazon-corretto-${JAVA_VERSION}-linux-x64 /opt/jdk && \
+    ln -s /opt/amazon-corretto-${JDK_VERSION}-alpine-linux-x64 /opt/jdk && \
 # Clean up
     rm -rf /opt/jdk/*src.zip /tmp/*
 #
